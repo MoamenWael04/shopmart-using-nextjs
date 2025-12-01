@@ -14,6 +14,9 @@ import MyStar from '@/components/Mystar/MyStar';
 import { Button } from '@/components/ui/button';
 import { Heart, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
+import AddToCart from "@/components/AddToCart/AddToCart";
+
+
 
 export default async function Products() {
   const response = await fetch('https://ecommerce.routemisr.com/api/v1/products');
@@ -48,10 +51,8 @@ export default async function Products() {
 
 
 
-      <CardFooter className='gap-2'>
-        <Button className='grow'><ShoppingCart /> Add to Cart</Button>
-        <Heart />
-      </CardFooter>
+          <AddToCart productId={product._id}/>
+
       </Card>
   </div>
 

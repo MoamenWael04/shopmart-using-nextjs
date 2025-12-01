@@ -1,6 +1,7 @@
-import { BatteryFull, ShoppingCart, User } from 'lucide-react'
+'use client'
+import { BatteryFull, Loader, ShoppingCart, User } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
+import React, { useContext } from 'react'
 import { Badge } from "@/components/ui/badge"
 import {
   NavigationMenu,
@@ -27,8 +28,10 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cartContext } from '../Context/CartContext'
 
 export default function Navbar() {
+   const {cartData , isLoading} = useContext(cartContext)
   return <>
   <nav className='py-4 bg-gray-100 shadow shadow-l mb-10'>
     <div className="container mx-auto">
@@ -85,7 +88,7 @@ export default function Navbar() {
                     <Link href={'./cart'}>
                     <ShoppingCart />
                       <Badge className="h-5 absolute -top-3 -end-3 min-w-5 rounded-full px-1 font-mono tabular-nums">
-                         8
+                         {isLoading ? <Loader className='animate-spin'/> :cartData?.numOfCartItems}
                      </Badge>
                      </Link>
                  </div>
