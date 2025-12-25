@@ -24,20 +24,30 @@ import { Input } from '@/components/ui/input';
 import { registerUser } from '../products/_actions/register.Action';
 
 // ================= SCHEMA =================
-const formSchema = z
-  .object({
-    name: z.string().min(3).max(20),
-    email: z.string().email(),
-    password: z.string().regex(
-      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\S+$).{5,20}$/
-    ),
-    rePassword: z.string(),
-    phone: z.string().regex(/^(?:\+20|0)(10|11|12|15)\d{8}$/),
-  })
-  .refine((data) => data.password === data.rePassword, {
-    path: ['rePassword'],
-    message: 'Passwords do not match',
-  });
+const formSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters").max(20, "Name too long"),
+  email: z.string().email("Invalid email address"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/(?=.*[a-z])/, "Must contain lowercase letter")
+    .regex(/(?=.*[A-Z])/, "Must contain uppercase letter")
+    .regex(/(?=.*\d)/, "Must contain a number")
+    .regex(/(?=.*[@$!%*?&])/, "Must contain a special character (@$!%*?&)")
+    .max(50),
+  rePassword: z.string(),
+  phone: z.string()
+    .trim()
+    .refine((val) => {
+      const cleaned = val.replace(/[\s\-\(\)]/g, '');
+      return /^(\+?20|0)?1[0125]\d{8}$/.test(cleaned);
+    }, {
+      message: "Invalid Egyptian mobile number (e.g. 01012345678)",
+    }),
+})
+.refine((data) => data.password === data.rePassword, {
+  message: "Passwords do not match",
+  path: ["rePassword"],
+});
 
 type FormFields = z.infer<typeof formSchema>;
 
@@ -58,24 +68,29 @@ export default function Register() {
     },
   });
 
-  const onSubmit = async (values: FormFields) => {
-    try {
-      setIsLoading(true);
+const onSubmit = async (values: FormFields) => {
+  try {
+    setIsLoading(true);
 
-      const data = await registerUser(values);
+    const data = await registerUser(values);
+    
+    // ADD THIS LINE TO SEE THE RESPONSE
+    console.log('Server response:', data);
 
-      if (data.status === 'success') {
-        toast.success('Account created successfully');
-        router.push('/login');
-      } else {
-        toast.error(data.message || 'Registration failed');
-      }
-    } catch {
-      toast.error('Something went wrong');
-    } finally {
-      setIsLoading(false);
+    if (data.message === 'success') {
+      toast.success('Account created successfully');
+      router.push('/login');
+    } else {
+      // Improved error message
+      toast.error(data.message || data.error || 'Registration failed');
     }
-  };
+  } catch (error: any) {
+    console.log('Submission error:', error);
+    toast.error(error.message || 'Something went wrong');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flex flex-col justify-center items-center min-h-[75vh]">
