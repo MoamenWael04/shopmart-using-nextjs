@@ -1,5 +1,5 @@
 'use client'
-import { BatteryFull, Loader, ShoppingCart, User } from 'lucide-react'
+import { BatteryFull, Heart, Loader, ShoppingCart, User } from 'lucide-react'
 import Link from 'next/link'
 import React, { useContext } from 'react'
 import { Badge } from "@/components/ui/badge"
@@ -29,8 +29,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cartContext } from '../Context/CartContext'
+import { signOut, useSession } from 'next-auth/react'
 
 export default function Navbar() {
+    const session = useSession()
    const {cartData , isLoading} = useContext(cartContext)
   return <>
   <nav className='py-4 bg-gray-100 shadow shadow-l mb-10'>
@@ -46,14 +48,15 @@ export default function Navbar() {
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                     <NavigationMenuLink asChild>
-                        <Link href="/categories">Categories</Link>
+                        <Link href="/brands">Brands</Link>
                     </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                     <NavigationMenuLink asChild>
-                        <Link href="/brands">Brands</Link>
+                        <Link href="/categories">Categories</Link>
                     </NavigationMenuLink>
                     </NavigationMenuItem>
+                    
                 </NavigationMenuList>
             </NavigationMenu>
             <div className='flex items-center gap-3'>
@@ -65,12 +68,24 @@ export default function Navbar() {
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                  <DropdownMenuSeparator />
                             <DropdownMenuGroup>
+                            {
+                                session.status=='authenticated' &&
+                                <>
                                 <Link href={'./profile'}>
                                 <DropdownMenuItem>
                                     Profile
                                 </DropdownMenuItem>
                                 </Link>
-                                <Link href={'./login'}>
+                                <DropdownMenuItem onClick={()=>signOut()}>
+                                    LogOut
+                                </DropdownMenuItem>
+                                </>
+                            }
+                               
+                                {
+                                    session.status == 'unauthenticated' &&
+                                    <>
+                                    <Link href={'./login'}>
                                 <DropdownMenuItem>
                                     Login
                                 </DropdownMenuItem>
@@ -80,11 +95,16 @@ export default function Navbar() {
                                     Register
                                 </DropdownMenuItem>
                                 </Link>
+                                </>
+                                }
                             </DropdownMenuGroup>
                        
                         </DropdownMenuContent>
                  </DropdownMenu>
-                 <div className='relative'>
+                 {
+                    session.status=='authenticated'&&
+                    <>
+                    <div className='relative'>
                     <Link href={'./cart'}>
                     <ShoppingCart />
                       <Badge className="h-5 absolute -top-3 -end-3 min-w-5 rounded-full px-1 font-mono tabular-nums">
@@ -92,6 +112,11 @@ export default function Navbar() {
                      </Badge>
                      </Link>
                  </div>
+                 <div className='p-2'>
+                    <Link href={'/wishlist'}><Heart /></Link>
+                 </div>
+                 </>
+                 }
             </div>
 
         </div>

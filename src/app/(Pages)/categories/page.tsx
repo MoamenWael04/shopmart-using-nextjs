@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import Image from 'next/image';
+import Link from 'next/link';
 export default async function Categories() {
   const response = await fetch("https://ecommerce.routemisr.com/api/v1/categories",{
     method:"GET"
@@ -17,7 +18,9 @@ export default async function Categories() {
     return <>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:gris-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
           {categories.map((category)=>
-          <div key={category._id} className="h-80">
+            <div key={category._id} className="h-80">
+          <Link href={'/categories/'+category._id}>
+        
             <Card className="h-full">
             <div className="h-48 overflow-hidden">
               <Image className='w-full h-full object-cover' src={category.image} width={300} height={300} alt={category.name}/>
@@ -26,8 +29,10 @@ export default async function Categories() {
               <CardTitle className='text-center'>{category.name}</CardTitle>
             </CardHeader>
           </Card>
-          </div>
           
+          </Link>
+          </div>
+
           )}
           
           </div>

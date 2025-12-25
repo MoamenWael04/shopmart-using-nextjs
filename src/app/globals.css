@@ -46,7 +46,7 @@ h1{
   @apply text-2xl font-semibold
 }
 h2{
-  @apply text-xl font-medium
+  @apply text-2xl font-medium
 }
 
 :root {
